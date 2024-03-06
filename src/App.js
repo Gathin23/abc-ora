@@ -356,8 +356,9 @@ function App() {
         
 
       </div>
-      <div className="mt-5 max-w-3xl items-center"> {abcstring && <Midi notation={abcstring} />}</div>
+      <div className="mt-5  z-50"> {notation && <Midi notation={notation} />}</div>
 
+      {/* THIS IS FOR ART CREATION UNCOMMENT TO WORK ON IT */}
       {/* <button
         className="border bg-blue-400 rounded-md p-2"
         onClick={() => {
@@ -375,8 +376,8 @@ function App() {
       >
         Get Art
       </button> */}
-      <div className="bg-white">
-        <Notation notation={abcstring} />
+      <div className="flex bg-white justify-center items-center">
+        <Notation notation={notation} />
       </div>
 
       <img src={artURL || ""} alt="" />
