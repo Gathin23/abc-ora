@@ -2,13 +2,17 @@ import { ethers } from "ethers";
 import { useState } from "react";
 import { Notation, Midi } from "react-abc";
 import ConnectButton from "./components/ConnectButton";
-import { useWeb3ModalProvider, useWeb3ModalAccount } from '@web3modal/ethers5/react'
+import {
+  useWeb3ModalProvider,
+  useWeb3ModalAccount,
+} from "@web3modal/ethers5/react";
 import { TitleCard } from "./components/TitleCard";
-
+import { Boxes } from "./components/ui/background-boxes";
+import { cn } from "./utils/cn";
 
 function App() {
-  const { address, chainId, isConnected } = useWeb3ModalAccount()
-  const { walletProvider } = useWeb3ModalProvider()
+  const { address, chainId, isConnected } = useWeb3ModalAccount();
+  const { walletProvider } = useWeb3ModalProvider();
 
   let [character, setCharacter] = useState("");
   let [mood, setMood] = useState("");
@@ -58,7 +62,7 @@ function App() {
 
   let contract = null;
 
-    let abi = JSON.parse(`[
+  let abi = JSON.parse(`[
       {
         "inputs": [
           {
@@ -240,7 +244,7 @@ function App() {
       }
     ]`);
 
-    let contractAddress = "0x4FA7f34ead1252c2AD43ca0909c07eC4a9a525C6";
+  let contractAddress = "0x4FA7f34ead1252c2AD43ca0909c07eC4a9a525C6";
 
   const createArt = async (character, mood) => {
     let provider = new ethers.providers.Web3Provider(walletProvider);
@@ -284,65 +288,77 @@ function App() {
 
   // renderAbc("target", output);
 
-  // let abcstring = `X: 1
-  // T: Cooley's
-  // M: 4/4
-  // L: 1/8
-  // K: Emin
-  // |:D2|"Em"EB{c}BA B2 EB|~B2 AB dBAG|"D"FDAD BDAD|FDAD dAFD|
-  // "Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|"Em"DEFD E2:|
-  // |:gf|"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|
-  // "Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|"Em"DEFD E2:|`;
+  let abcstring = `X: 1
+  T: Cooley's
+  M: 4/4
+  L: 1/8
+  K: Emin
+  |:D2|"Em"EB{c}BA B2 EB|~B2 AB dBAG|"D"FDAD BDAD|FDAD dAFD|
+  "Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|"Em"DEFD E2:|
+  |:gf|"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|
+  "Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|"Em"DEFD E2:|`;
 
   return (
     <div>
-      <ConnectButton/>
-      <TitleCard/>
+      <ConnectButton />
+      <TitleCard />
 
-      <form className="p-5">
-        <label className="block mb-2">
-          Character:
-          <input
-            type="text"
-            value={character}
-            onChange={(e) => setCharacter(e.target.value)}
-            className="mt-1 rounded-md border border-gray-600"
-          />
-        </label>
-        <label className="block">
-          Mood:
-          <input
-            type="text"
-            value={mood}
-            onChange={(e) => setMood(e.target.value)}
-            className="mt-1 rounded-md border border-gray-600"
-          />
-        </label>
-      </form>
+      <div className="h-96 relative w-full overflow-hidden bg-black flex flex-col items-center justify-center rounded-lg">
+        <div className="absolute inset-0 w-full h-full black z-20 [mask-image:radial-gradient(transparent,white)] pointer-events-none" />
 
-      <button
-        className="border bg-blue-400 rounded-md p-2"
-        onClick={() => {
-          if ( mood && character) {
-            calculateAIResult(prompt);
-          } else {
-            alert("Please fill in the character and mood fields");
-          }
-        }}
-      >
-        Create song
-      </button>
+        <Boxes />
+        <form className="p-5 flex flex-col justify-center items-center z-50">
+          <label className="block mb-2 text-white font-bold">
+            Character:
+            <input
+              type="text"
+              value={character}
+              onChange={(e) => setCharacter(e.target.value)}
+              className="mt-1 ml-2 rounded-md bg-black border border-white py-2"
+            />
+          </label>
+          <label className="mt-5 block text-white font-bold ml-8">
+            Mood:
+            <input
+              type="text"
+              value={mood}
+              onChange={(e) => setMood(e.target.value)}
+              className="mt-1 ml-2 rounded-md bg-black border border-white py-2"
+            />
+          </label>
+        </form>
+        <button
+          onClick={() => {
+            if (mood && character) {
+              calculateAIResult(prompt);
+            } else {
+              alert("Please fill in the character and mood fields");
+            }
+          }}
+          className="mt-10 ml-16 inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-600 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 z-50"
+        >
+          Create song
+        </button>
+        <span className="z-50 mt-10 ml-16">
+          <p className="text-white font-light">
+            First Create a song and wait 30-40s before clicking Get Song
+          </p>
+        </span>
 
-      <button
-        className="border bg-blue-400 rounded-md p-2"
-        onClick={() => {
-          getAIResult(prompt);
-        }}
-      >
-        Get Song
-      </button>
+        <button
+          onClick={() => {
+            getAIResult(prompt);
+          }}
+          className=" ml-16 inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-600 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 z-50"
+        >
+          Get Song
+        </button>
+        
 
-      <button
+      </div>
+      <div className="mt-5 max-w-3xl items-center"> {abcstring && <Midi notation={abcstring} />}</div>
+
+      {/* <button
         className="border bg-blue-400 rounded-md p-2"
         onClick={() => {
           createArt(character, mood);
@@ -354,18 +370,14 @@ function App() {
       <button
         className="border bg-blue-400 rounded-md p-2"
         onClick={() => {
-          getArt(character,mood);
+          getArt(character, mood);
         }}
       >
         Get Art
-      </button>
-
-      <div id="target"></div>
-
-      <Notation notation={notation} />
-
-      {notation && <Midi notation={notation} />}
-
+      </button> */}
+      <div className="bg-white">
+        <Notation notation={abcstring} />
+      </div>
 
       <img src={artURL || ""} alt="" />
     </div>
