@@ -35,7 +35,7 @@ export const BoxesCore = ({ className, ...rest }) => {
       {rows.map((_, i) => (
         <motion.div
           key={`row` + i}
-          className="w-16 h-8  border-l  border-zinc-800 relative"
+          className="w-16 h-8  border-l  border-zinc-700 relative"
         >
           {cols.map((_, j) => (
             <motion.div
@@ -56,7 +56,7 @@ export const BoxesCore = ({ className, ...rest }) => {
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className="absolute h-6 w-10 -top-[14px] -left-[22px] text-zinc-900 stroke-[1px] pointer-events-none"
+                  className="absolute h-6 w-10 -top-[14px] -left-[22px] text-zinc-700 stroke-[1px] pointer-events-none"
                 >
                   <path
                     strokeLinecap="round"
