@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Notation, Midi } from "react-abc";
 import ConnectButton from "./components/ConnectButton";
 import { useWeb3ModalProvider, useWeb3ModalAccount } from '@web3modal/ethers5/react'
+import { TitleCard } from "./components/TitleCard";
 
 
 function App() {
@@ -296,20 +297,7 @@ function App() {
   return (
     <div>
       <ConnectButton/>
-      {/* <button
-        className="border bg-blue-400 rounded-md p-2"
-        onClick={() => {
-          if (contract && !connected) {
-            ethereum
-              .request({ method: "eth_requestAccounts" })
-              .then((accounts) => {
-                setConnected(true);
-              });
-          }
-        }}
-      >
-        {!connected ? "Connect wallet" : "Connected"}
-      </button> */}
+      <TitleCard/>
 
       <form className="p-5">
         <label className="block mb-2">
