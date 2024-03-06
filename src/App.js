@@ -9,6 +9,7 @@ function App() {
   let [character, setCharacter] = useState("");
   let [mood, setMood] = useState("");
   const [notation, setNotation] = useState("");
+  const [artURL, setArtURL] = useState("");
   let prompt = `Generate a music theme in ABCjs format for a character with the following characteristics: ${character} and mood: ${mood}. Ensure the music accurately reflects the character's traits and the specified mood. Follow these steps:
 
   Key signature: It's usually denoted with K: followed by the note and the scale type, like C for C major. It wasn't specified in your provided output, but if we're in the key of C major (which doesn't need to be specified as it's the default), we wouldn't necessarily include this unless a different key is desired.
@@ -242,6 +243,23 @@ function App() {
     contract = new ethers.Contract(address, abi, signer);
   }
 
+  const createArt = async (character, mood) => {
+    let result = await contract.calculateAIResult(
+      1,
+      `A character with the following characteristics: ${character} and mood: ${mood}.`
+    );
+    console.log(result);
+  };
+
+  const getArt = async (character, mood) => {
+    let result = await contract.getAIResult(
+      1,
+      `A character with the following characteristics: ${character} and mood: ${mood}.`
+    );
+    console.log(`https://ipfs.io/ipfs/${result}`);
+    setArtURL(`https://ipfs.io/ipfs/${result}`);
+  };
+
   const calculateAIResult = async (prompt) => {
     let result = await contract.calculateAIResult(0, prompt);
     console.log(result);
@@ -253,8 +271,8 @@ function App() {
     setNotation(result);
   };
 
-  // renderAbc("target", output);   
-  
+  // renderAbc("target", output);
+
   let abcstring = `X: 1
   T: Cooley's
   M: 4/4
@@ -264,8 +282,6 @@ function App() {
   "Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|"Em"DEFD E2:|
   |:gf|"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|
   "Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|"Em"DEFD E2:|`;
-
-  
 
   return (
     <div>
@@ -321,22 +337,38 @@ function App() {
       <button
         className="border bg-blue-400 rounded-md p-2"
         onClick={() => {
-            getAIResult(prompt);
+          getAIResult(prompt);
         }}
       >
         Get Song
       </button>
-      
+
+      <button
+        className="border bg-blue-400 rounded-md p-2"
+        onClick={() => {
+          createArt(character, mood);
+        }}
+      >
+        Create Art
+      </button>
+
+      <button
+        className="border bg-blue-400 rounded-md p-2"
+        onClick={() => {
+          getArt(character,mood);
+        }}
+      >
+        Get Art
+      </button>
+
       <div id="target"></div>
 
       <Notation notation={notation} />
-      
-    {notation && <Midi notation={abcstring} />}
 
-      
+      {notation && <Midi notation={abcstring} />}
 
 
-
+      <img src={artURL || ""} alt="" />
     </div>
   );
 }
