@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useState } from "react";
 import { Notation, Midi } from "react-abc";
 import ConnectButton from "./components/ConnectButton";
@@ -65,186 +65,289 @@ function App() {
   let contract = null;
 
   let abi = JSON.parse(`[
-      {
-        "inputs": [
-          {
-            "internalType": "contract IAIOracle",
-            "name": "_aiOracle",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "contract IAIOracle",
-            "name": "expected",
-            "type": "address"
-          },
-          {
-            "internalType": "contract IAIOracle",
-            "name": "found",
-            "type": "address"
-          }
-        ],
-        "name": "UnauthorizedCallbackSource",
-        "type": "error"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "address",
-            "name": "sender",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "modelId",
-            "type": "uint256"
-          },
-          {
-            "indexed": false,
-            "internalType": "string",
-            "name": "prompt",
-            "type": "string"
-          }
-        ],
-        "name": "promptRequest",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "modelId",
-            "type": "uint256"
-          },
-          {
-            "indexed": false,
-            "internalType": "string",
-            "name": "input",
-            "type": "string"
-          },
-          {
-            "indexed": false,
-            "internalType": "string",
-            "name": "output",
-            "type": "string"
-          }
-        ],
-        "name": "promptsUpdated",
-        "type": "event"
-      },
-      {
-        "inputs": [],
-        "name": "aiOracle",
-        "outputs": [
-          {
-            "internalType": "contract IAIOracle",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "modelId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "prompt",
-            "type": "string"
-          }
-        ],
-        "name": "calculateAIResult",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "modelId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "prompt",
-            "type": "string"
-          }
-        ],
-        "name": "getAIResult",
-        "outputs": [
-          {
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "name": "prompts",
-        "outputs": [
-          {
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "modelId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "input",
-            "type": "bytes"
-          },
-          {
-            "internalType": "bytes",
-            "name": "output",
-            "type": "bytes"
-          }
-        ],
-        "name": "storeAIResult",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      }
-    ]`);
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "requestId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "output",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "callbackData",
+          "type": "bytes"
+        }
+      ],
+      "name": "aiOracleCallback",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "modelId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "prompt",
+          "type": "string"
+        }
+      ],
+      "name": "calculateAIResult",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IAIOracle",
+          "name": "_aiOracle",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IAIOracle",
+          "name": "expected",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IAIOracle",
+          "name": "found",
+          "type": "address"
+        }
+      ],
+      "name": "UnauthorizedCallbackSource",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "requestId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "modelId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "prompt",
+          "type": "string"
+        }
+      ],
+      "name": "promptRequest",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "requestId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "modelId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "input",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "output",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "callbackData",
+          "type": "bytes"
+        }
+      ],
+      "name": "promptsUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "aiOracle",
+      "outputs": [
+        {
+          "internalType": "contract IAIOracle",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "AIORACLE_CALLBACK_GAS_LIMIT",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "modelId",
+          "type": "uint256"
+        }
+      ],
+      "name": "estimateFee",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "modelId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "prompt",
+          "type": "string"
+        }
+      ],
+      "name": "getAIResult",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "requestId",
+          "type": "uint256"
+        }
+      ],
+      "name": "isFinalized",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "prompts",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "requests",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "modelId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "input",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "output",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]`);
 
   let nftAbi = JSON.parse(`[
     {
@@ -817,16 +920,18 @@ function App() {
     }
   ]`);
 
-  let contractAddress = "0x4FA7f34ead1252c2AD43ca0909c07eC4a9a525C6";
+  let contractAddress = "0x64BF816c3b90861a489A8eDf3FEA277cE1Fa0E82";
   let nftAddress = "0x47C342958f83cEDc7a851c6A05C62abB011AE7Ae";
 
   const createArt = async (character, mood) => {
     let provider = new ethers.providers.Web3Provider(walletProvider);
     let signer = provider.getSigner();
     contract = new ethers.Contract(contractAddress, abi, signer);
+    let fee = await contract.estimateFee(50);
     let result = await contract.calculateAIResult(
-      1,
+      50,
       `A character with the following characteristics: ${character} and mood: ${mood}.`
+      ,{value: fee}
     );
     console.log(result);
   };
@@ -836,18 +941,20 @@ function App() {
     let signer = provider.getSigner();
     contract = new ethers.Contract(contractAddress, abi, signer);
     let result = await contract.getAIResult(
-      1,
+      50,
       `A character with the following characteristics: ${character} and mood: ${mood}.`
     );
     console.log(`https://ipfs.io/ipfs/${result}`);
     setArtURL(`https://ipfs.io/ipfs/${result}`);
   };
 
+  //SONG
   const calculateAIResult = async (prompt) => {
     let provider = new ethers.providers.Web3Provider(walletProvider);
     let signer = provider.getSigner();
     contract = new ethers.Contract(contractAddress, abi, signer);
-    let result = await contract.calculateAIResult(0, prompt);
+    let fee = await contract.estimateFee(11);
+    let result = await contract.calculateAIResult(11, prompt,{value: fee});
     console.log(result);
   };
 
@@ -855,7 +962,7 @@ function App() {
     let provider = new ethers.providers.Web3Provider(walletProvider);
     let signer = provider.getSigner();
     contract = new ethers.Contract(contractAddress, abi, signer);
-    let result = await contract.getAIResult(0, prompt);
+    let result = await contract.getAIResult(11, prompt);
     console.log(result);
     setNotation(result);
   };

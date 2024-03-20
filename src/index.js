@@ -12,7 +12,7 @@ const testnet = {
   name: 'Sepolia Testnet',
   currency: 'SepoliaETH',
   explorerUrl: 'https://sepolia.etherscan.io/',
-  rpcUrl: 'https://eth-sepolia.public.blastapi.io	'
+  rpcUrl: 'https://1rpc.io/sepolia'
 }
 
 // 3. Create modal
