@@ -11,12 +11,22 @@ import { Boxes } from "./components/ui/background-boxes";
 import { BackgroundGradientAnimation } from "./components/ui/background-gradient-animation";
 
 function App() {
+  let abcstring = `X: 1
+  T: Cooley's
+  M: 4/4
+  L: 1/8
+  K: Emin
+  |:D2|"Em"EB{c}BA B2 EB|~B2 AB dBAG|"D"FDAD BDAD|FDAD dAFD|
+  "Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|"Em"DEFD E2:|
+  |:gf|"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|
+  "Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|"Em"DEFD E2:|`;
+
   const { address, chainId, isConnected } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
 
   let [character, setCharacter] = useState("");
   let [mood, setMood] = useState("");
-  const [notation, setNotation] = useState("");
+  const [notation, setNotation] = useState();
   const [artURL, setArtURL] = useState("");
   const [view, setView] = useState(0);
 
@@ -1113,7 +1123,7 @@ function App() {
   ]`);
 
   let contractAddress = "0x64BF816c3b90861a489A8eDf3FEA277cE1Fa0E82";
-  let nftAddress = "0xD44Bcb446C627D4f8b89b11201385832f08734aB";
+  let nftAddress = "0x537997C90916EDe13d5179A46446b0AAc8AE2EAf";
 
   const createArt = async (character, mood) => {
     let provider = new ethers.providers.Web3Provider(walletProvider);
@@ -1159,25 +1169,40 @@ function App() {
     setNotation(result);
   };
 
-  let url = "https://google.com";
-  const mintNFT = async (address, url) => {
+ 
+  const mintNFT = async (address, url, character, notation) => {
     let provider = new ethers.providers.Web3Provider(walletProvider);
     let signer = provider.getSigner();
     contract = new ethers.Contract(nftAddress, nftAbi, signer);
-    let tokenID = await contract.nextTokenID();
-    let result = await contract.mint(StringTOBYTES32CONTRACT,0x00,tokenID.JSON,0x00);
+
+    const myHeaders = new Headers();
+
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      "name": character,
+      "ipfs": url,
+      "theme": notation
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+
+    let file = await fetch("https://nft.susanoox.in/create", requestOptions)
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .then((result) => {return result})
+      .catch((error) => console.error(error));
+    let result = await contract.mint(0x01, 0x00, file.file, 0x00);
     console.log(result);
   };
 
-  let abcstring = `X: 1
-  T: Cooley's
-  M: 4/4
-  L: 1/8
-  K: Emin
-  |:D2|"Em"EB{c}BA B2 EB|~B2 AB dBAG|"D"FDAD BDAD|FDAD dAFD|
-  "Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|"Em"DEFD E2:|
-  |:gf|"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|
-  "Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|"Em"DEFD E2:|`;
 
   return (
     <div className="">
@@ -1253,7 +1278,7 @@ function App() {
         </div>
         <button
           onClick={() => {
-            mintNFT(address, url);
+            mintNFT(address, artURL, character, notation);
           }}
           className="mt-5 ml-16 inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-600 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 z-50"
         >
