@@ -9,7 +9,6 @@ import {
 import { TitleCard } from "./components/TitleCard";
 import { Boxes } from "./components/ui/background-boxes";
 import { BackgroundGradientAnimation } from "./components/ui/background-gradient-animation";
-import { cn } from "./utils/cn";
 
 function App() {
   const { address, chainId, isConnected } = useWeb3ModalAccount();
@@ -371,8 +370,8 @@ function App() {
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "initialOwner",
+          "internalType": "contract IVerifier",
+          "name": "_verifierContract",
           "type": "address"
         }
       ],
@@ -574,6 +573,30 @@ function App() {
       "type": "event"
     },
     {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "aigcData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "string",
+          "name": "uri",
+          "type": "string"
+        }
+      ],
+      "name": "masterMint",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "anonymous": false,
       "inputs": [
         {
@@ -584,6 +607,77 @@ function App() {
         }
       ],
       "name": "MetadataUpdate",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "prompt",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "aigcData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "string",
+          "name": "uri",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes",
+          "name": "proof",
+          "type": "bytes"
+        }
+      ],
+      "name": "mint",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes",
+          "name": "prompt",
+          "type": "bytes"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes",
+          "name": "aigcData",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "uri",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "proof",
+          "type": "bytes"
+        }
+      ],
+      "name": "Mint",
       "type": "event"
     },
     {
@@ -618,6 +712,11 @@ function App() {
           "internalType": "address",
           "name": "to",
           "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenID",
+          "type": "uint256"
         },
         {
           "internalType": "string",
@@ -761,6 +860,19 @@ function App() {
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "_nextTokenId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -793,6 +905,25 @@ function App() {
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getMetadata",
+      "outputs": [
+        {
+          "internalType": "bytes16",
+          "name": "",
+          "type": "bytes16"
         }
       ],
       "stateMutability": "view",
@@ -907,6 +1038,25 @@ function App() {
           "type": "uint256"
         }
       ],
+      "name": "tokenIdMetadata",
+      "outputs": [
+        {
+          "internalType": "bytes16",
+          "name": "metadata",
+          "type": "bytes16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
       "name": "tokenURI",
       "outputs": [
         {
@@ -917,11 +1067,53 @@ function App() {
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "verifierContract",
+      "outputs": [
+        {
+          "internalType": "contract IVerifier",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "prompt",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "aigcData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "proof",
+          "type": "bytes"
+        }
+      ],
+      "name": "verify",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
   ]`);
 
   let contractAddress = "0x64BF816c3b90861a489A8eDf3FEA277cE1Fa0E82";
-  let nftAddress = "0x47C342958f83cEDc7a851c6A05C62abB011AE7Ae";
+  let nftAddress = "0xD44Bcb446C627D4f8b89b11201385832f08734aB";
 
   const createArt = async (character, mood) => {
     let provider = new ethers.providers.Web3Provider(walletProvider);
@@ -930,8 +1122,8 @@ function App() {
     let fee = await contract.estimateFee(50);
     let result = await contract.calculateAIResult(
       50,
-      `A character with the following characteristics: ${character} and mood: ${mood}.`
-      ,{value: fee}
+      `A character with the following characteristics: ${character} and mood: ${mood}.`,
+      { value: fee }
     );
     console.log(result);
   };
@@ -954,7 +1146,7 @@ function App() {
     let signer = provider.getSigner();
     contract = new ethers.Contract(contractAddress, abi, signer);
     let fee = await contract.estimateFee(11);
-    let result = await contract.calculateAIResult(11, prompt,{value: fee});
+    let result = await contract.calculateAIResult(11, prompt, { value: fee });
     console.log(result);
   };
 
@@ -972,7 +1164,8 @@ function App() {
     let provider = new ethers.providers.Web3Provider(walletProvider);
     let signer = provider.getSigner();
     contract = new ethers.Contract(nftAddress, nftAbi, signer);
-    let result = await contract.safeMint(address, url);
+    let tokenID = await contract.nextTokenID();
+    let result = await contract.mint(StringTOBYTES32CONTRACT,0x00,tokenID.JSON,0x00);
     console.log(result);
   };
 
@@ -1017,11 +1210,15 @@ function App() {
         </form>
         <button
           onClick={() => {
-            if (mood && character) {
-              calculateAIResult(prompt);
-              createArt(character, mood);
+            if (isConnected) {
+              if (mood && character) {
+                calculateAIResult(prompt);
+                createArt(character, mood);
+              } else {
+                alert("Please fill in the character and mood fields");
+              }
             } else {
-              alert("Please fill in the character and mood fields");
+              alert("Please connect your wallet");
             }
           }}
           className="mt-5 ml-16 inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-600 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 z-50"
